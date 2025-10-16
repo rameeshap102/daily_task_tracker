@@ -4,7 +4,12 @@ import sqlite3
 import os
 
 
+
+
 app = Flask(__name__)
+
+# Initialize database on startup
+init_db()
 
 
 # Database initialization with due_date column added
