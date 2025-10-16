@@ -25,8 +25,8 @@
             color: #e2e8f0;
         }
 
-        [data-theme="dark"] .date-section,
-        [data-theme="dark"] .stat-card,
+       [data-theme="dark"] .date-section,
+
         [data-theme="dark"] .add-task-section,
         [data-theme="dark"] .task-list-section {
             background: rgba(45, 55, 72, 0.8);
@@ -257,14 +257,66 @@
         }
 
         .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            animation: fadeInUp 0.6s ease backwards;
-            min-width: 0;
-        }
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.6s ease backwards;
+    min-width: 0;
+    color: white;
+}
+
+/* Individual colored cards */
+.stat-card:nth-child(1) { 
+    background: linear-gradient(135deg, #4361ee, #3b82f6);
+    animation-delay: 0.1s; 
+}
+
+.stat-card:nth-child(2) { 
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    animation-delay: 0.2s; 
+}
+
+.stat-card:nth-child(3) { 
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    animation-delay: 0.3s; 
+}
+
+.stat-card:nth-child(4) { 
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    animation-delay: 0.4s; 
+}
+
+/* White text for colored backgrounds */
+.stat-card .stat-title,
+.stat-card .stat-number,
+.stat-card .stat-subtitle {
+    color: white !important;
+}
+
+.stat-card .progress-text {
+    color: white !important;
+}
+
+/* White progress bars on colored backgrounds */
+.stat-card .progress-bar {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.stat-card .progress-fill {
+    background: white !important;
+}
+
+/* Adjust SVG circles for white on colored background */
+.stat-card:nth-child(1) #progress-circle {
+    stroke: white;
+}
+
+.stat-card:nth-child(1) svg circle:first-child {
+    stroke: rgba(255, 255, 255, 0.3);
+}
+
 
         .stat-card:nth-child(1) { animation-delay: 0.1s; }
         .stat-card:nth-child(2) { animation-delay: 0.2s; }
@@ -615,6 +667,149 @@
                 transform: translateY(-10px);
             }
         }
+
+
+        /* ========== MOBILE RESPONSIVENESS ========== */
+        
+        /* Tablets and smaller */
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            
+            .stat-card {
+                padding: 15px;
+            }
+            
+            .stat-title {
+                font-size: 11px;
+            }
+            
+            .stat-number {
+                font-size: 24px;
+            }
+            
+            .progress-circle {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .progress-circle svg {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .progress-circle circle {
+                r: 32;
+                cx: 40;
+                cy: 40;
+            }
+            
+            .progress-text {
+                font-size: 18px;
+            }
+            
+            .header h1 {
+                font-size: 26px;
+            }
+            
+            .header-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+            
+            .task-input-group {
+                flex-direction: column;
+            }
+            
+            .add-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        /* Mobile phones */
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .stat-card {
+                padding: 18px;
+            }
+            
+            .progress-card {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .progress-circle {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .progress-circle svg {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .progress-circle circle {
+                r: 40;
+                cx: 50;
+                cy: 50;
+            }
+            
+            .progress-text {
+                font-size: 20px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .subtitle {
+                font-size: 13px;
+            }
+            
+            .date-display {
+                font-size: 20px;
+            }
+            
+            .date-picker-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .today-btn {
+                width: 100%;
+            }
+            
+            .task-item {
+                padding: 12px;
+            }
+            
+            .task-title {
+                font-size: 14px;
+            }
+            
+            .theme-toggle {
+                width: 32px;
+                height: 32px;
+                top: 15px;
+                right: 15px;
+            }
+        }
+
+
+
     </style>
 </head>
 <body>
