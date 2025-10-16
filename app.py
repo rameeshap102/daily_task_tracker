@@ -8,8 +8,7 @@ import os
 
 app = Flask(__name__)
 
-# Initialize database on startup
-init_db()
+
 
 
 # Database initialization with due_date column added
@@ -187,6 +186,9 @@ def clear_completed():
     conn.close()
     return redirect(url_for('index', date=selected_date))
 
+
+# Initialize database when module loads
+init_db()
 
 if __name__ == '__main__':
     init_db()
