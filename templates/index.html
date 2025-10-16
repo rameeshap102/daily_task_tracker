@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Task Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e3e8f0 0%, #d4dce8 100%);
+            min-height: 100vh;
+            padding: 20px;
+            transition: background 0.3s ease;
+        }
+
+        /* Dark Mode */
+        [data-theme="dark"] body {
+            background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 100%);
+            color: #e2e8f0;
+        }
+
+        [data-theme="dark"] .date-section,
+        [data-theme="dark"] .stat-card,
+        [data-theme="dark"] .add-task-section,
+        [data-theme="dark"] .task-list-section {
+            background: rgba(45, 55, 72, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        [data-theme="dark"] h1,
+        [data-theme="dark"] h3,
+        [data-theme="dark"] .stat-number,
+        [data-theme="dark"] .task-title {
+            color: #e2e8f0;
+        }
+
+        [data-theme="dark"] .subtitle,
+        [data-theme="dark"] .stat-title,
+        [data-theme="dark"] .stat-subtitle,
+        [data-theme="dark"] .task-time,
+        [data-theme="dark"] .task-counter {
+            color: #a0aec0;
+        }
+
+        [data-theme="dark"] .task-input {
+            background: rgba(45, 55, 72, 0.5);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+        }
+
+        [data-theme="dark"] .task-item {
+            background: rgba(45, 55, 72, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1) rotate(15deg);
+        }
+
+        [data-theme="dark"] .theme-toggle {
+            background: rgba(45, 55, 72, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #4361ee, #3b82f6);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        h1 {
+            color: #1e3a5f;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .date-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            animation: slideIn 0.6s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .date-display {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e3a5f;
+            margin-bottom: 12px;
+        }
+
+        [data-theme="dark"] .date-display {
+            color: #e2e8f0;
+        }
+
+        .quick-access-label {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .date-picker-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        [data-theme="dark"] .date-picker-row {
+            border-top-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .date-input {
+            padding: 8px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .date-input:hover {
+            border-color: #4361ee;
+        }
+
+        .date-input:focus {
+            outline: none;
+            border-color: #4361ee;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        [data-theme="dark"] .date-input {
+            background: rgba(45, 55, 72, 0.5);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+        }
+
+        .today-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #4361ee, #3b82f6);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .today-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+        }
+
+        .calendar-icon {
+            font-size: 18px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+            min-width: 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease backwards;
+            min-width: 0;
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .stat-title {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1e3a5f;
+        }
+
+        .stat-subtitle {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .progress-card {
+            position: relative;
+        }
+
+        .progress-circle {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .progress-circle svg {
+            transform: rotate(-90deg);
+        }
+
+        .progress-circle circle {
+            transition: stroke-dashoffset 1s ease, stroke 0.3s ease;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+            color: #4361ee;
+            transition: color 0.3s ease;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .add-task-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        .section-icon {
+            width: 32px;
+            height: 32px;
+            background: #4361ee;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .task-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .task-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .task-input:focus {
+            outline: none;
+            border-color: #4361ee;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .add-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .task-counter {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        .clear-completed {
+            color: #ef4444;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            float: right;
+            transition: all 0.3s ease;
+        }
+
+        .clear-completed:hover {
+            color: #dc2626;
+            text-decoration: underline;
+        }
+
+        .task-list-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .list-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .list-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .pending-icon {
+            background: #f97316;
+        }
+
+        .completed-icon {
+            background: #22c55e;
+        }
+
+        .task-count-badge {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            animation: taskFadeIn 0.45s ease backwards;
+        }
+
+        @keyframes taskFadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .task-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .task-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #cbd5e1;
+            border-radius: 50%;
+            cursor: pointer;
+            background: white;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: transparent;
+            font-size: 14px;
+        }
+
+        .task-checkbox:hover {
+            border-color: #4361ee;
+            transform: scale(1.1);
+        }
+
+        .task-item.completed .task-checkbox {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border-color: #22c55e;
+            color: white;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-title {
+            font-size: 15px;
+            color: #1e3a5f;
+            margin-bottom: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .task-time {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover .task-actions {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 6px 8px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .action-btn:hover {
+            background: rgba(0,0,0,0.05);
+            transform: scale(1.1);
+        }
+
+        .task-item.completed {
+            border-left: 4px solid #22c55e;
+            background: linear-gradient(90deg, rgba(34, 197, 94, 0.05), #f8fafc);
+        }
+
+        .task-item.completed .task-title {
+            text-decoration: line-through;
+            color: #94a3b8;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 30px;
+            color: #94a3b8;
+            font-size: 15px;
+        }
+
+        .empty-state::before {
+            content: "🎉";
+            display: block;
+            font-size: 48px;
+            margin-bottom: 12px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <span id="theme-icon">🌙</span>
+    </button>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-icon">✓</div>
+            <h1>Daily Task Tracker</h1>
+            <p class="subtitle">Transform your productivity with our beautiful and intuitive task management system</p>
+        </div>
+
+        <!-- Date Section -->
+        <div class="date-section">
+            <div class="date-display" id="formatted-date">October 15, 2025</div>
+            
+            <div class="quick-access-label">Quick Access</div>
+            <div class="date-picker-row">
+                <span class="calendar-icon">📅</span>
+                <input type="date" 
+                       id="date-picker" 
+                       class="date-input" 
+                       value="{{ selected_date }}"
+                       onchange="changeDate(this.value)">
+                <button class="today-btn" onclick="goToToday()">Today</button>
+            </div>
+        </div>
+
+        <!-- Statistics Grid -->
+        <div class="stats-grid">
+            <!-- Progress Card -->
+            <div class="stat-card progress-card">
+                <div class="stat-title">Today Progress</div>
+                <div class="progress-circle">
+                    <svg width="100" height="100">
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="#e2e8f0" stroke-width="8"/>
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="#4361ee" stroke-width="8" 
+                                stroke-dasharray="251.2" 
+                                stroke-dashoffset="{{ 251.2 - (251.2 * progress / 100) }}"
+                                id="progress-circle"/>
+                    </svg>
+                    <div class="progress-text" id="progress-text">{{ progress }}%</div>
+                </div>
+                <div class="stat-subtitle" style="text-align: center; margin-top: 10px;">
+                    {{ completed_tasks }} of {{ total_tasks }} completed
+                </div>
+            </div>
+
+            <!-- Total Tasks -->
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Total Tasks</span>
+                    <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #4361ee, #3b82f6); border-radius: 8px;"></div>
+                </div>
+                <div class="stat-number">{{ total_tasks }}</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%; background: linear-gradient(90deg, #4361ee, #3b82f6);"></div>
+                </div>
+                <div class="stat-subtitle">All items</div>
+            </div>
+
+            <!-- Completed -->
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Completed</span>
+                    <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #22c55e, #16a34a); border-radius: 8px;"></div>
+                </div>
+                <div class="stat-number">{{ completed_tasks }}</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{ progress }}%; background: linear-gradient(90deg, #22c55e, #16a34a);"></div>
+                </div>
+                <div class="stat-subtitle">All done</div>
+            </div>
+
+            <!-- Pending -->
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Pending</span>
+                    <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #f97316, #ea580c); border-radius: 8px;"></div>
+                </div>
+                <div class="stat-number">{{ pending_tasks }}</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{ (pending_tasks / total_tasks * 100) if total_tasks > 0 else 0 }}%; background: linear-gradient(90deg, #f97316, #ea580c);"></div>
+                </div>
+                <div class="stat-subtitle">All left</div>
+            </div>
+        </div>
+
+        <!-- Add New Task -->
+        <div class="add-task-section">
+            <div class="section-header">
+                <div class="section-icon">+</div>
+                <h3>Add New Task</h3>
+            </div>
+            <form method="POST" action="/add" class="task-input-group" onsubmit="return handleSubmit(event)">
+                <input type="text" name="title" class="task-input" 
+                       placeholder="What would you like to accomplish today?" required
+                       id="task-input">
+                <input type="hidden" name="due_date" id="hidden-due-date" value="{{ selected_date }}">
+                <button type="submit" class="add-btn">
+                    + Add Task
+                </button>
+            </form>
+            <p style="font-size: 12px; color: #94a3b8; margin-top: 10px;">
+                💡 Press Enter to quickly add your task
+            </p>
+        </div>
+
+        <!-- Task Counter and Clear -->
+        <div class="task-counter">
+            {{ pending_tasks }} pending - {{ completed_tasks }} completed
+            {% if completed_tasks > 0 %}
+            <form method="POST" action="/clear_completed" style="display: inline;">
+                <input type="hidden" name="date" value="{{ selected_date }}">
+                <button type="submit" class="clear-completed">🗑️ Clear Completed ({{ completed_tasks }})</button>
+            </form>
+            {% endif %}
+        </div>
+
+        <!-- Pending Tasks -->
+        <div class="task-list-section">
+            <div class="list-header">
+                <div class="list-icon pending-icon">○</div>
+                <h3>Pending Tasks</h3>
+                <span class="task-count-badge">{{ pending_tasks }}</span>
+            </div>
+            {% set pending = tasks|selectattr('completed', 'equalto', 0)|list %}
+            {% if pending %}
+                {% for task in pending %}
+                <div class="task-item">
+                    <form method="POST" action="/complete/{{ task.id }}" style="display: inline;">
+                        <input type="hidden" name="date" value="{{ selected_date }}">
+                        <button type="submit" class="task-checkbox">
+                        </button>
+                    </form>
+                    <div class="task-content">
+                        <div class="task-title">{{ task.title }}</div>
+                        <div class="task-time">Created {{ task.created_at }}</div>
+                    </div>
+                    <div class="task-actions">
+                        <a href="/edit/{{ task.id }}" class="action-btn">✏️</a>
+                        <form method="POST" action="/delete/{{ task.id }}" style="display: inline;">
+                            <input type="hidden" name="date" value="{{ selected_date }}">
+                            <button type="submit" class="action-btn" onclick="return confirm('Delete this task?')">🗑️</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    No pending tasks. Great job!
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Completed Tasks -->
+        <div class="task-list-section">
+            <div class="list-header">
+                <div class="list-icon completed-icon">✓</div>
+                <h3>Completed Tasks</h3>
+                <span class="task-count-badge" style="background: #dcfce7; color: #166534;">{{ completed_tasks }}</span>
+            </div>
+            {% set completed = tasks|selectattr('completed', 'equalto', 1)|list %}
+            {% if completed %}
+                {% for task in completed %}
+                <div class="task-item completed">
+                    <form method="POST" action="/uncomplete/{{ task.id }}" style="display: inline;">
+                        <input type="hidden" name="date" value="{{ selected_date }}">
+                        <button type="submit" class="task-checkbox">
+                            ✓
+                        </button>
+                    </form>
+                    <div class="task-content">
+                        <div class="task-title">{{ task.title }}</div>
+                        <div class="task-time">Created {{ task.created_at }}</div>
+                    </div>
+                    <div class="task-actions">
+                        <a href="/edit/{{ task.id }}" class="action-btn">✏️</a>
+                        <form method="POST" action="/delete/{{ task.id }}" style="display: inline;">
+                            <input type="hidden" name="date" value="{{ selected_date }}">
+                            <button type="submit" class="action-btn" onclick="return confirm('Delete this task?')">🗑️</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    No completed tasks yet. Start completing! 💪
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Format and display selected date
+        function formatDisplayDate(dateString) {
+            const date = new Date(dateString + 'T00:00:00');
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        // Update the formatted date display
+        function updateFormattedDate() {
+            const picker = document.getElementById('date-picker');
+            const display = document.getElementById('formatted-date');
+            if (picker && display) {
+                display.textContent = formatDisplayDate(picker.value);
+            }
+        }
+
+        // Theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            // Update icon
+            const icon = document.getElementById('theme-icon');
+            icon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // Load theme from localStorage
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.getElementById('theme-icon').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // Auto-detect system theme
+        function detectSystemTheme() {
+            if (!localStorage.getItem('theme')) {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const theme = prefersDark ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', theme);
+                document.getElementById('theme-icon').textContent = theme === 'dark' ? '☀️' : '🌙';
+            }
+        }
+
+        // Date picker functions
+        function changeDate(date) {
+            window.location.href = '/?date=' + date;
+        }
+
+        function goToToday() {
+            const today = new Date().toISOString().split('T')[0];
+            window.location.href = '/?date=' + today;
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Escape key - clear input
+            if (e.key === 'Escape') {
+                document.getElementById('task-input').value = '';
+                document.getElementById('task-input').blur();
+            }
+        });
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            loadTheme();
+            detectSystemTheme();
+            updateFormattedDate();
+            
+            // Update hidden due date field when date picker changes
+            if (document.getElementById('date-picker')) {
+                document.getElementById('date-picker').addEventListener('change', function() {
+                    if (document.getElementById('hidden-due-date')) {
+                        document.getElementById('hidden-due-date').value = this.value;
+                    }
+                });
+            }
+        });
+
+        // Form submit animation
+        function handleSubmit(e) {
+            const input = document.getElementById('task-input');
+            if (input.value.trim()) {
+                input.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    input.style.transform = 'scale(1)';
+                }, 200);
+            }
+            return true;
+        }
+    </script>
+</body>
+</html>
